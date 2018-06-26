@@ -1,7 +1,8 @@
 # Leech
 This tool performs a recursive directory lookup given a directory listing
 
-usage: leech.pl [--help] [--proxy proxy:port] [--port port] {--url URL} {--type 1|2|3|4} {--fname filename}
+``usage: leech.pl [--help] [--proxy proxy:port] [--port port] {--url URL} {--type 1|2|3|4} {--fname filename}
+
        [--cookie "cookie_val"] [--basic username:password ] [--swiggler] [--verbose]
          --help : prints what you are looking at now
          --url : url to send requests to
@@ -21,4 +22,4 @@ usage: leech.pl [--help] [--proxy proxy:port] [--port port] {--url URL} {--type 
       Example 1:  $0 --proxy http://localhost:8080/ --url http://site.com --port 80 --type 1
           --fname dirlisting.txt --ssl --root /admin/test/  --cookie "JSESSIONID=nj33ks"
       Example 2:  $0 --url site.com:80 --type 1 --fname dirlisting.txt --swiggler
-      Example 3:  $0 --url https://site.com:8080 --type 3 --fname lsalr.txt --verbose
+      Example 3:  $0 --url https://site.com:8080 --type 3 --fname lsalr.txt --verbose``
