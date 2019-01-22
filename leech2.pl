@@ -1,9 +1,11 @@
 #!/usr/bin/perl
+# Copyright(R) Rajat Swarup 2007
+# Mail suggestions or bugs to rajats@gmail.com
 # Leech - Loops thru Extraneous files in wEbroot and fetCHes them
 # Leech requires a recursive directory listing of the web server or application server filesystem
 # Given the URL, Port, any proxy servers required, Leech recursively tries to download the files.
 # It creates a log file called "downloadable-files.log" that lists the files that were downloaded.
-# Leech v1.2
+# Leech v1.3
 
 # TODO
 # =====
@@ -23,6 +25,7 @@
 # 1. URL support
 # 2. wget support with the use of a proxy had bugs
 # 3. Folder naming scheme needed some tweaking
+# 4. Activity logging
 
 # Added features
 # ==============
@@ -30,6 +33,8 @@
 
 require LWP::UserAgent;
 require HTTP::Request;
+use HTTP::Cookies;
+
 use MIME::Base64;
 use Getopt::Std;
 use Getopt::Long;
@@ -287,8 +292,8 @@ END
     {
       unless ($OS = $^O)
       {
-	require Config;
-	$OS = $Config::Config{'osname'};
+        require Config;
+        $OS = $Config::Config{'osname'};
       }
     }
     if    ($OS=~/Win/i)     { $OS = 'WINDOWS'; $delimiter = '\\\\';}
@@ -302,7 +307,7 @@ END
     $hostname = join('_',@modhostname);
     my $foldername = sprintf ("%02d%02d%02d-%s-%d",$timenow[2],$timenow[1],$timenow[0],$hostname,$port);
     #my $foldername = join("",$timenow[2],$timenow[1],$timenow[0],"-",$hostname,"-",$port);
-    mkdir ($foldername,"0755") || die "Could not create directory $foldername";
+    mkdir ($foldername,0755) || die "Could not create directory $foldername";
     if ($type == 1)
     {
       dirparser::dir_parser($fname,"$foldername/test-temp.log");
@@ -334,6 +339,7 @@ END
     open RECURSIVE_PATHS, "< $foldername/test-temp2.log" or die "Could not open $foldername/test-temp2.log";
     open DOWNLOAD_LOG,"> $foldername/downloadable-files.log" or die "Cannot create file $foldername/downloadable-files.log!\n";
     open PRESENT_BUT_NO_ACCESS,"> $foldername/access-denied.log" or die "Cannot create file $foldername/access-denied.log!\n";
+    open ACTIVITY_LOG,"> $foldername/activity.log" or die "Cannot create file $foldername/activity.log!\n";
 
     # basic authentication block
     if ($basic ne '')
@@ -348,6 +354,8 @@ END
     my $count = 0; # no_of_requests
     my $dloadedcount = 0;
     my $count403s = 0;
+    my $cookie_jar = HTTP::Cookies->new();
+
     if ($proxy ne '')
     {
       if ( $url =~ /https:/ )
@@ -365,6 +373,7 @@ END
     if ($cookie ne '')
     {
       $wgetswitch .= " --header=$cookie ";
+      #$ua->cookie_jar( $cookie_jar );
     }
     if ($path =~ /https:/)
     {
@@ -398,6 +407,7 @@ END
       if ($verbose)
       {
         print $statuscode." : ".$path;
+        print ACTIVITY_LOG $statuscode." : ".$path."\n";
       }
 
       if ($statuscode == 200 || $statuscode  == 403)
@@ -449,6 +459,7 @@ END
     close DOWNLOAD_LOG;
     close PRESENT_BUT_NO_ACCESS;
     close RECURSIVE_PATHS;
+    close ACTIVITY_LOG;
     print "Summary:\n-------\nTotal files downloaded = $dloadedcount\nTotal requests made = $count\n";
     print "All downloaded files are saved to $foldername/downloads.\n";
     print "The files that Leech downloaded are listed in $foldername/downloaded-files.log.\n"  ;
@@ -536,5 +547,5 @@ sub swiggler
 
 sub nikto_cloner
 {
-  
+
 }
