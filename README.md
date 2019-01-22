@@ -2,7 +2,6 @@
 This tool performs a recursive directory lookup given a directory listing
 
 ``usage: leech.pl [--help] [--proxy proxy:port] [--port port] {--url URL} {--type 1|2|3|4} {--fname filename}
-
        [--cookie "cookie_val"] [--basic username:password ] [--swiggler] [--verbose]
          --help : prints what you are looking at now
          --url : url to send requests to
